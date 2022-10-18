@@ -49,7 +49,7 @@ We strongly suggest you use a feature lookup table. Read `feature_vectors.md` fo
 
 ### States :yellow_circle:
 
-Unlike typical Connect 4, where there are 7 columns and 6 rows, we’re using **8 columns**. The board is a 6x8 `numpy` array.
+Unlike typical Connect 4, where there are 7 columns and 6 rows, we’re using **8 columns**. This is to reduce the power of taking the first move. The board is a `6 x 8` `numpy` array.
 
 The **first axis is the row index** and the **2nd axis is the column index**.
 
@@ -63,22 +63,30 @@ Since there are `3 ** 48 = 1e23` possible states, we strongly suggest you use fe
 
 ### Actions :axe:
 
-**The index (`0` -> `7`) of the column to drop your counter into.** In the above diagram, this is the number on the **2nd Axis**. The index of a column that is full (there are no spaces left) is an invalid action.
+**The actions correspond to the index (`0` -> `7`) of the column to drop your counter into.**
+
+In the above diagram, this is the number on the **2nd Axis**. The index of a column that is full (there are no spaces left) is an invalid action.
 
 ### Rewards :moneybag:
 
-You receive `+1` for winning, `-1` for losing and `0` for a draw. You receive `0` for all other moves.
+| Step | Reward |
+|------|------|
+|  You win | `+1` |
+|  You lose | `-1` |
+|  All other steps | `0` |
+
 
 ## Functions you write :point_left:
 
 <details>
 <summary><code style="white-space:nowrap;">  to_feature_vector()</code></summary>
-Write this to convert a state in
-to a feature vector. These features are used to represent the state in the value function lookup table.
+Write this to convert a state into a feature vector. These features are used to represent the state in the value function lookup table.
 <br />
+    
 <br />
 Input is the state (<code style="white-space:nowrap;">np.array</code>) and output is a <code style="white-space:nowrap;">tuple</code> which you design! The better the features you pick out, the faster your agent will learn and better it can be at Connect-4.
 <br />
+
 <br />
 Too detailed of a feature vector and it'll take a long time to train. Not enough detail and your agent will hit a ceiling since too many varied states will look identical.
 <br />
@@ -154,6 +162,22 @@ Like above, but randomly picks from non-full columns.
 Takes the state as input and outputs an action.
 </details>
 
+
+<details>
+<summary><code style="white-space:nowrap;">  reward_function()</code></summary>
+What reward would be received in state 'successor_state' after taking action 'last_action_taken'
+<br />
+<br />
+Takes the state and an action as input and outputs a float
+</details>
+
+<details>
+<summary><code style="white-space:nowrap;">  place_piece()</code></summary>
+The transition function. Returns a tuple of ('board', 'row'), where 'board' is the 'board' after a piece has been placed in 'column_idx' by 'player'.
+<br />
+</details>
+
+
 <details>
 <summary><code style="white-space:nowrap;">  play_connect_4_game()</code></summary>
 Plays 1 game of Connect 4, which can be visualsed either in the console (if <code style="white-space:nowrap;">verbose=True</code>) or rendered visually (if <code style="white-space:nowrap;">render = True</code>). Outputs the return for your agent.
@@ -177,9 +201,9 @@ Inputs:
 
 There are **a load** of functions in `game_mechanics.py`. The useful functions are clearly indicated and are explained in their docstrings.
 
-**We suggest you use these to form your features, but don't change them.** This is because the original `game_mechanics.py` file will be used in the competition.
+We suggest you use these to form your features. However, **you cannot change the `game_mechanics.py` file**. The original will be used in the competition.
 
-If you want to tweak one, copy-paste it to `main.py` and rename it.
+If you want to tweak one of these functions, copy-paste it to `main.py` and rename it.
 
 ## Suggested Approach :+1:
 
