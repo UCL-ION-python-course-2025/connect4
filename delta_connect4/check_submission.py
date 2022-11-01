@@ -9,7 +9,7 @@ def check_submission(team_name: str) -> None:
     example_state = get_empty_board()
     expected_choose_move_return_type = int
     game_mechanics_expected_hash = (
-        "7b5bdf9c183f19aa1e6ea32118dcb76d43508b61e535123ef2af66091b3465c8"
+        "2e948aa40139207a623568121ddd8aa7cedd2ba5add39a44f431a9e1daa0b4f9"
     )
     expected_pkl_output_type = dict
 

@@ -8,9 +8,9 @@ these are clearly marked.
 """
 import pickle
 import random
+import time
 from pathlib import Path
 from time import sleep
-import time
 from typing import Callable, Dict, Optional, Tuple
 
 import numpy as np
@@ -124,7 +124,7 @@ def get_top_piece_row_index(board: np.ndarray, column_idx: int) -> Optional[int]
 
 
 def place_piece(board: np.ndarray, column_idx: int, player: int = 1) -> Tuple[np.ndarray, int]:
-    """Place a piece from a player on the board. has_wonThis falls down to the lowest available space in
+    """Place a piece from a player on the board.  This falls down to the lowest available space in
     the column.
 
     Args:
