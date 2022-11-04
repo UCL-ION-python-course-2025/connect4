@@ -11,15 +11,14 @@ from game_mechanics import (
     get_piece_longest_line_length,
     get_top_piece_row_index,
     has_won,
+    human_player,
     is_column_full,
     load_dictionary,
     place_piece,
     play_connect_4_game,
     reward_function,
     save_dictionary,
-    human_player,
 )
-
 
 TEAM_NAME = "Team Name"  # <---- Enter your team name here!
 assert TEAM_NAME != "Team Name", "Please change your TEAM_NAME!"
@@ -59,10 +58,8 @@ def train() -> Dict:
 
 
 def choose_move(state: np.ndarray, value_function: Dict, verbose: bool = False) -> int:
-    """
-    Called during competitive play. It acts greedily given
-    current state of the board and value function dictionary.
-    It returns a single move to play.
+    """Called during competitive play. It acts greedily given current state of the board and value
+    function dictionary. It returns a single move to play.
 
     Args:
         state: State of the board as a np array. Your pieces are
@@ -121,10 +118,8 @@ if __name__ == "__main__":
     #  opponent, think about how you might want to adapt this to
     #  test the performance of your algorithm.
     def choose_move_no_value_fn(state: np.ndarray) -> int:
-        """
-        The arguments to play_connect_4_game() require functions that
-            only take the state as input.
-        """
+        """The arguments to play_connect_4_game() require functions that only take the state as
+        input."""
         return choose_move(state, my_value_fn)
 
     # Play a game against your bot! Click a column to

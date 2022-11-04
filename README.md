@@ -82,7 +82,7 @@ In the above diagram, this is the number on the **2nd Axis**. The index of a col
 <summary><code style="white-space:nowrap;">  to_feature_vector()</code></summary>
 Write this to convert a state into a feature vector. These features are used to represent the state in the value function lookup table.
 <br />
-    
+
 <br />
 Input is the state (<code style="white-space:nowrap;">np.array</code>) and output is a <code style="white-space:nowrap;">tuple</code> which you design! The better the features you pick out, the faster your agent will learn and better it can be at Connect-4.
 <br />
@@ -103,7 +103,7 @@ Output the trained dictionary so it can be saved.
 <br />
 <br />
 You can structure your value dictionary however you like,
-but the existing implementation of <code style="white-space:nowrap;">choose_move()</code> expects <code style="white-space:nowrap;">{feature_vector: value}</code>. 
+but the existing implementation of <code style="white-space:nowrap;">choose_move()</code> expects <code style="white-space:nowrap;">{feature_vector: value}</code>.
 <br />
 <br />
 If you structure it another way, you'll have to tweak <code style="white-space:nowrap;">choose_move()</code>
@@ -127,8 +127,8 @@ The opponent's <code style="white-space:nowrap;">choose_move()</code> function i
 The first player is chosen at random when <code style="white-space:nowrap;">Connect4Env.reset()</code> is called. Every time you call <code style="white-space:nowrap;">Connect4Env.step()</code>, 2 moves are taken - yours and then your opponent's. Your opponent sees a 'flipped' version of the board, where their pieces are shown as <code style="white-space:nowrap;">1</code>'s and yours are shown as <code style="white-space:nowrap;">-1</code>'s.
     <br />
     <br />
-Connect4Env takes 3 optional arguments:  
-    
+Connect4Env takes 3 optional arguments:
+
 - <code style="white-space:nowrap;">verbose</code> Whether to print the board and logging information (such as the position of the move recent move) to the console.
 - <code style="white-space:nowrap;">render</code> Whether to render the game graphically. The player plays with red counters and the opponent players with yellow. Set this to True if you want to play against your bot yourself.
 - <code style="white-space:nowrap;">game_speed_multiplier</code> How fast to render a game (only has an effect when render= True). Low number = slow. High number = fast.
