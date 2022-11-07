@@ -14,7 +14,6 @@ from time import sleep
 from typing import Callable, Dict, Optional, Tuple
 
 import numpy as np
-
 import pygame.gfxdraw
 
 
@@ -115,13 +114,7 @@ def is_column_full(board: np.ndarray, column_idx: int) -> bool:
 
 def get_top_piece_row_index(board: np.ndarray, column_idx: int) -> Optional[int]:
     """Gets the row index of the top piece in a specified column."""
-    # Find the empty spaces in the column
-    for count, element in enumerate(board[:, column_idx]):
-        if element != 0:
-            # Find lowest row index in the column
-            return count
-    # If empty, return None
-    return None
+    return next((count for count, element in enumerate(board[:, column_idx]) if element != 0), None)
 
 
 def place_piece(board: np.ndarray, column_idx: int, player: int = 1) -> Tuple[np.ndarray, int]:
@@ -393,8 +386,7 @@ def human_player(state) -> int:
             # handle MOUSEBUTTONUP
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
-                col = pos_to_col(pos)
-                return col
+                return pos_to_col(pos)
 
 
 def get_empty_board(num_rows: int = 6, num_cols: int = 8) -> np.ndarray:
