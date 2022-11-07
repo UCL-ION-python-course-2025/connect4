@@ -42,6 +42,13 @@ def to_feature_vector(state: np.ndarray) -> Tuple:
         the feature vector for this state, as
          designed by you.
     """
+
+    # Here is an example feature vector that you could encode
+    if np.sum(state) == 0:
+        # If the board is empty, return a feature vector
+        #  that is all zeros.
+        return (0,) * 6
+
     raise NotImplementedError("You need to implement the to_feature_vector() function! :)")
 
 
@@ -51,8 +58,8 @@ def train() -> Dict:
 
     Returns:
         Value function dictionary used by your agent.
-         You can structure this how you like, but
-         choose_move() expects {feature_vector: value}.
+        You can structure this how you like, but the current choose_move()
+        implementation expects {feature_vector: value}.
     """
     raise NotImplementedError("You need to implement the train() function!")
 
@@ -76,12 +83,18 @@ def choose_move(state: np.ndarray, value_function: Dict, verbose: bool = False) 
     not_full_cols = [col for col in range(state.shape[1]) if not is_column_full(state, col)]
 
     for not_full_col in not_full_cols:
+
         # Do 1-step lookahead and compare values of successor states
+        # (You need to copy the state because place_piece() modifies the state in-place)
         state_copy = state.copy()
+
+        # The place piece function is used to place a piece in a column
+        # It works inplace, so you don't need to return the board
         place_piece(board=state_copy, column_idx=not_full_col, player=1)
 
         # Get the feature vector associated with the successor state
         features = to_feature_vector(state_copy)
+
         if verbose:
             print(
                 "Column index:",
@@ -92,11 +105,15 @@ def choose_move(state: np.ndarray, value_function: Dict, verbose: bool = False) 
                 value_function.get(features, 0),
             )
 
-        # Add the action value to the values list
+        # Get the value of the successor state and so the value of placing a counter in
+        # this column
         action_value = value_function.get(features, 0) + reward_function(not_full_col, state_copy)
+
+        # Store the value of placing a piece in each column
         values.append(action_value)
 
-    # Pick randomly between max value actions
+    # Return the column with the highest value. If there are multiple columns with the same
+    # value then choose one at random.
     max_value = max(values)
     value_indices = [index for index, value in enumerate(values) if value == max_value]
     value_index = random.choice(value_indices)

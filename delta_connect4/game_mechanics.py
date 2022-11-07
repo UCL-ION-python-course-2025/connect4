@@ -6,6 +6,7 @@ This is a set of functions written by Delta to
 Several functions below may be useful to you and can be imported,
 these are clearly marked.
 """
+import os
 import pickle
 import random
 import time
@@ -57,31 +58,20 @@ def play_connect_4_game(
     return total_return
 
 
+#################### POTENTIALLY USEFUL FUNCTIONS ################################
+
+
 def reward_function(last_action_taken: int, successor_state: np.ndarray) -> float:
-    """Reward function for the Connect 4 MDP."""
+    """Reward function for the Connect 4 MDP. What reward would be given to the player who just took
+    last_action_taken to put the board into the successor_state?
+
+    Args:
+        last_action_taken: The column index of the last action taken
+        successor_state: The board after the last action was taken
+
+    Returns: The reward, (1.0 if winning else 0.0)
+    """
     return int(has_won(successor_state, last_action_taken))
-
-
-# Loading and saving dictionaries as files:
-
-
-def get_dict_filepath(team_name: str) -> Path:
-    return Path(__file__).parent.resolve() / f"dict_{team_name}.pkl"
-
-
-def save_dictionary(dict_to_save: Dict, team_name: str) -> None:
-    """Use this to save your value function dictionary."""
-    with get_dict_filepath(team_name).open("wb") as f:
-        pickle.dump(dict_to_save, f)
-
-
-def load_dictionary(team_name: str) -> Dict:
-    """Loads in a previously-saved value function dictionary."""
-    with get_dict_filepath(team_name).open("rb") as f:
-        return pickle.load(f)
-
-
-########## POTENTIALLY USEFUL FUNCTIONS ############################
 
 
 def has_won(board: np.ndarray, column_index: int) -> bool:
@@ -113,7 +103,7 @@ def is_column_full(board: np.ndarray, column_idx: int) -> bool:
 
 
 def get_top_piece_row_index(board: np.ndarray, column_idx: int) -> Optional[int]:
-    """Gets the row index of the top piece in a specified column."""
+    """Gets the row index of the highest piece in a specified column."""
     return next((count for count, element in enumerate(board[:, column_idx]) if element != 0), None)
 
 
@@ -203,13 +193,7 @@ def get_piece_longest_line_length(board: np.ndarray, piece_location: Tuple[int, 
     return max(direction_row_lengths)
 
 
-### THESE FUNCTIONS ARE LESS USEFUL ###
-
-
-def board_full(board: np.ndarray) -> bool:
-    return np.all(board != 0)
-
-
+###################################### The env ############################################
 class Connect4Env:
     N_ROWS = 6
     N_COLS = 8
@@ -303,7 +287,7 @@ class Connect4Env:
                 print("Board full. It's a tie!")
 
         # Change self.player only when game isn't over
-        self._player *= -1 if not self.done else 1
+        self._player *= 1 if self.done else -1
 
         return reward
 
@@ -375,6 +359,13 @@ class Connect4Env:
         pygame.display.update()
 
 
+################## THESE FUNCTIONS ARE LESS USEFUL ############################
+
+
+def board_full(board: np.ndarray) -> bool:
+    return np.all(board != 0)
+
+
 def pos_to_col(pos: Tuple[int, int]) -> int:
     return pos[0] // Connect4Env.SQUARE_SIZE
 
@@ -391,3 +382,33 @@ def human_player(state) -> int:
 
 def get_empty_board(num_rows: int = 6, num_cols: int = 8) -> np.ndarray:
     return np.zeros((num_rows, num_cols))
+
+
+################### Loading and saving dictionaries as files #####################
+
+HERE = Path(__file__).parent.resolve()
+
+
+def save_dictionary(my_dict: Dict, team_name: str) -> None:
+    assert isinstance(
+        my_dict, dict
+    ), f"train() function should output a dict, but got: {type(my_dict)}"
+    assert "/" not in team_name, "Invalid TEAM_NAME. '/' are illegal in TEAM_NAME"
+
+    n_retries = 5
+    dict_path = os.path.join(HERE, f"dict_{team_name}.pkl")
+    for attempt in range(n_retries):
+        try:
+            with open(dict_path, "wb") as f:
+                pickle.dump(my_dict, f)
+            load_dictionary(team_name)
+            return
+        except Exception as e:
+            if attempt == n_retries - 1:
+                raise
+
+
+def load_dictionary(team_name: str, umbrella: Path = HERE) -> Dict:
+    dict_path = os.path.join(umbrella, f"dict_{team_name}.pkl")
+    with open(dict_path, "rb") as f:
+        return pickle.load(f)

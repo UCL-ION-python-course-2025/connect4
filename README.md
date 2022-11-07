@@ -17,16 +17,20 @@ Your task is to build a **Reinforcement Learning agent** that plays **Connect 4*
 # Competition Rules :crossed_swords:
 
 ## 1. You must build a **Reinforcement Learning** agent.
+
 - Rules-based agents **aren't allowed**!
+
 ## 2. You can only write code in `main.py`
-- You can only store data in a dictionary (saved in a `.pkl` file by `save_dictionary()`*)
+
+- You can only store data in a dictionary (saved in a `.pkl` file by `save_dictionary()`\*)
 - In the competition, your agent will call the `choose_move()` function in `main.py` to select a move
 - Any code not in `main.py` **will not be used**.
 - **Check your submission is valid with `check_submission()`**
 
-*`save_dictionary()` is a function in `game_mechanics.py`
+\*`save_dictionary()` is a function in `game_mechanics.py`
 
-## 3. Submission deadline: **5pm UTC, Sunday**.
+## 3. Submission deadline: **4pm UTC, Sunday**.
+
 - You can update your code after submitting, but **not after the deadline**.
 - Check your submission is valid with `check_submission()`
 
@@ -69,12 +73,11 @@ In the above diagram, this is the number on the **2nd Axis**. The index of a col
 
 ### Rewards :moneybag:
 
-| Step | Reward |
-|------|------|
-|  You win | `+1` |
-|  You lose | `-1` |
-|  All other steps | `0` |
-
+| Step            | Reward |
+| --------------- | ------ |
+| You win         | `+1`   |
+| You lose        | `-1`   |
+| All other steps | `0`    |
 
 ## Functions you write :point_left:
 
@@ -162,7 +165,6 @@ Like above, but randomly picks from non-full columns.
 Takes the state as input and outputs an action.
 </details>
 
-
 <details>
 <summary><code style="white-space:nowrap;">  reward_function()</code></summary>
 What reward would be received in state 'successor_state' after taking action 'last_action_taken'
@@ -174,9 +176,9 @@ Takes the state and an action as input and outputs a float
 <details>
 <summary><code style="white-space:nowrap;">  place_piece()</code></summary>
 The transition function. Returns a tuple of ('board', 'row'), where 'board' is the 'board' after a piece has been placed in 'column_idx' by 'player'.
+Warning: This function mutates the board in place.
 <br />
 </details>
-
 
 <details>
 <summary><code style="white-space:nowrap;">  play_connect_4_game()</code></summary>
@@ -199,7 +201,7 @@ Inputs:
 
 ## Other code :gear:
 
-There are **a load** of functions in `game_mechanics.py`. The useful functions are clearly indicated and are explained in their docstrings.
+There are **a load** of functions in `game_mechanics.py`. The useful functions are clearly indicated as "potentially useful files'. How they work is explained in their docstrings.
 
 We suggest you use these to form your features. However, **you cannot change the `game_mechanics.py` file**. The original will be used in the competition.
 
