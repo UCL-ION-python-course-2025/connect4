@@ -222,7 +222,6 @@ class Connect4Env:
         self.verbose = verbose
         self.render = render
         self.game_speed_multiplier = game_speed_multiplier
-        self.reset()
 
     def reset(self):
         """Resets game & takes 1st opponent move if they are chosen to go first."""
