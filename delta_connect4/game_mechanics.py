@@ -99,7 +99,7 @@ def is_column_full(board: np.ndarray, column_idx: int) -> bool:
     Returns:
         True if the column is full, False otherwise
     """
-    return len(np.where(board[:, column_idx] == 0)[0]) == 0
+    return board[0, column_idx] != 0
 
 
 def get_top_piece_row_index(board: np.ndarray, column_idx: int) -> Optional[int]:
