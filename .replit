@@ -1,7 +1,7 @@
 run = ["python3", "main.py"]
 language = "python3"
 entrypoint = "main.py"
-hidden = ["venv", "setup.py", ".config", "requirements_dev.txt", "**/__pycache__", "**/.mypy_cache", "**/*.pyc", "tests",".gitignore", ".pre-commit-config.yaml", "setup.cfg", "code/__init__.py", "__init__.py", "team_winner.py", "init_replit.sh", "images", "hash_game_mechanics.py", "poetry.lock", "pyproject.toml"]
+hidden = ["venv", "setup.py", ".config", "requirements_dev.txt", "**/__pycache__", "**/.mypy_cache", "**/*.pyc", "tests",".gitignore", ".pre-commit-config.yaml", "setup.cfg", "code/__init__.py", "__init__.py", "team_winner.py", "init_replit.sh", "images", "hash_game_mechanics.py", "poetry.lock", "pyproject.toml", "game_mechanics_hash.txt", "Makefile", ]
 
 audio = true
 
