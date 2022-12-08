@@ -15,6 +15,7 @@ from time import sleep
 from typing import Callable, Dict, Optional, Tuple
 
 import numpy as np
+
 import pygame.gfxdraw
 
 
