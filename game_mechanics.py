@@ -6,6 +6,7 @@ This is a set of functions written by Delta to
 Several functions below may be useful to you and can be imported,
 these are clearly marked.
 """
+
 import os
 import pickle
 import random
@@ -86,7 +87,9 @@ def has_won(board: np.ndarray, column_index: int) -> bool:
     Returns: True if game won, False otherwise
     """
     row_idx = get_top_piece_row_index(board, column_index)
-    assert row_idx is not None, f"Column {column_index} is empty in board shown below.\n\n{board}"
+    assert (
+        row_idx is not None
+    ), f"Column {column_index} is empty in board shown below.\n\n{board}"
     return get_piece_longest_line_length(board, (row_idx, column_index)) >= 4
 
 
@@ -105,10 +108,15 @@ def is_column_full(board: np.ndarray, column_idx: int) -> bool:
 
 def get_top_piece_row_index(board: np.ndarray, column_idx: int) -> Optional[int]:
     """Gets the row index of the highest piece in a specified column."""
-    return next((count for count, element in enumerate(board[:, column_idx]) if element != 0), None)
+    return next(
+        (count for count, element in enumerate(board[:, column_idx]) if element != 0),
+        None,
+    )
 
 
-def place_piece(board: np.ndarray, column_idx: int, player: int = 1) -> Tuple[np.ndarray, int]:
+def place_piece(
+    board: np.ndarray, column_idx: int, player: int = 1
+) -> Tuple[np.ndarray, int]:
     """Place a piece from a player on the board.  This falls down to the lowest available space in
     the column.
 
@@ -136,7 +144,9 @@ def place_piece(board: np.ndarray, column_idx: int, player: int = 1) -> Tuple[np
     return board, row_idx
 
 
-def get_piece_longest_line_length(board: np.ndarray, piece_location: Tuple[int, int]) -> int:
+def get_piece_longest_line_length(
+    board: np.ndarray, piece_location: Tuple[int, int]
+) -> int:
     """Get the length of the longest line of pieces that a piece is in.
 
     Args:
@@ -166,7 +176,11 @@ def get_piece_longest_line_length(board: np.ndarray, piece_location: Tuple[int, 
         # Take steps in positive direction until we hit a space not filled by this player's piece
         row = piece_location[0] + steps_in_positive_dir * direction[0]
         col = piece_location[1] + steps_in_positive_dir * direction[1]
-        while 0 <= row < board.shape[0] and 0 <= col < board.shape[1] and board[row, col] == player:
+        while (
+            0 <= row < board.shape[0]
+            and 0 <= col < board.shape[1]
+            and board[row, col] == player
+        ):
             num_in_a_row += 1
             steps_in_positive_dir += 1
             row = piece_location[0] + steps_in_positive_dir * direction[0]
@@ -217,7 +231,9 @@ class Connect4Env:
         render: bool = False,
         game_speed_multiplier: float = 1,
     ):
-        self._board_visualizer = np.vectorize(lambda x: "X" if x == 1 else "O" if x == -1 else " ")
+        self._board_visualizer = np.vectorize(
+            lambda x: "X" if x == 1 else "O" if x == -1 else " "
+        )
         self._opponent_choose_move = opponent_choose_move
         self._screen = None
         self.verbose = verbose
@@ -262,7 +278,9 @@ class Connect4Env:
         assert (
             isinstance(col, int) and 0 <= col < self._board.shape[1]
         ), f"Col should be an int between 0 and {self._board.shape[1]}"
-        assert not is_column_full(self._board, col), "You can't place a counter in a full column!"
+        assert not is_column_full(
+            self._board, col
+        ), "You can't place a counter in a full column!"
 
         self._board, row = place_piece(self._board, col, self._player)
 
@@ -335,9 +353,7 @@ class Connect4Env:
                 colour = (
                     self.RED_COLOR
                     if space == 1
-                    else self.YELLOW_COLOR
-                    if space == -1
-                    else self.BACKGROUND_COLOR
+                    else self.YELLOW_COLOR if space == -1 else self.BACKGROUND_COLOR
                 )
 
                 # Anti-aliased circle drawing
