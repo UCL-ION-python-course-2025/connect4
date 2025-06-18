@@ -15,8 +15,7 @@ TEAM_NAME = "Team Name"  # <---- Enter your team name here!
 assert TEAM_NAME != "Team Name", "Please change your TEAM_NAME!"
 
 
-
-def choose_move(board): # type: ignore[no-untyped-def]
+def choose_move(board):
     """
     This is what will be called during competitive play.
     It takes the current state of the board as input.
@@ -32,7 +31,7 @@ def choose_move(board): # type: ignore[no-untyped-def]
                         far left column and 7 is the far right
                         column.
     """
-       # Example solution which chooses a random not-full column to place the counter
+    # Example solution which chooses a random not-full column to place the counter
     # not_full_columns = []
     # for col in range(8):
     #     if not is_column_full(board, col):
@@ -42,9 +41,7 @@ def choose_move(board): # type: ignore[no-untyped-def]
     raise NotImplementedError("You need to implement this function")
 
 
-
 if __name__ == "__main__":
-
 
     # Play a game against your bot! Click a column to
     # place a counter!
