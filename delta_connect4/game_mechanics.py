@@ -6,13 +6,15 @@ This is a set of functions written by Delta to
 Several functions below may be useful to you and can be imported,
 these are clearly marked.
 """
+
+import copy
 import os
 import pickle
 import random
 import time
 from pathlib import Path
 from time import sleep
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -59,22 +61,6 @@ def play_connect_4_game(
     return total_return
 
 
-#################### POTENTIALLY USEFUL FUNCTIONS ################################
-
-
-def reward_function(last_action_taken: int, successor_state: np.ndarray) -> float:
-    """Reward function for the Connect 4 MDP. What reward would be given to the player who just took
-    last_action_taken to put the board into the successor_state?
-
-    Args:
-        last_action_taken: The column index of the last action taken
-        successor_state: The board after the last action was taken
-
-    Returns: The reward, (1.0 if winning else 0.0)
-    """
-    return int(has_won(successor_state, last_action_taken))
-
-
 def has_won(board: np.ndarray, column_index: int) -> bool:
     """Checks if a player has won based on the most recently-added piece on the board.
 
@@ -86,7 +72,8 @@ def has_won(board: np.ndarray, column_index: int) -> bool:
     Returns: True if game won, False otherwise
     """
     row_idx = get_top_piece_row_index(board, column_index)
-    assert row_idx is not None, f"Column {column_index} is empty in board shown below.\n\n{board}"
+    if row_idx is None:
+        return False
     return get_piece_longest_line_length(board, (row_idx, column_index)) >= 4
 
 
@@ -121,19 +108,20 @@ def place_piece(board: np.ndarray, column_idx: int, player: int = 1) -> Tuple[np
         Tuple of (board, row_index) where the board is updated
          and the row_index is the row index of the added piece.
     """
+    local_board = copy.deepcopy(board)
     assert player in {
         1,
         -1,
     }, f"Invalid player: {player}. Player must be 1 or -1"
     # Find the empty spaces in the column
-    top_piece_row_index = get_top_piece_row_index(board, column_idx)
+    top_piece_row_index = get_top_piece_row_index(local_board, column_idx)
     assert (
         top_piece_row_index != 0
     ), f"Invalid move! Attempted to place a piece in column {column_idx}, but it's full!"
     # Set item in the board to that player's number
-    row_idx = top_piece_row_index - 1 if top_piece_row_index else board.shape[0] - 1
-    board[row_idx, column_idx] = player
-    return board, row_idx
+    row_idx = top_piece_row_index - 1 if top_piece_row_index else local_board.shape[0] - 1
+    local_board[row_idx, column_idx] = player
+    return local_board, row_idx
 
 
 def get_piece_longest_line_length(board: np.ndarray, piece_location: Tuple[int, int]) -> int:
@@ -223,8 +211,9 @@ class Connect4Env:
         self.verbose = verbose
         self.render = render
         self.game_speed_multiplier = game_speed_multiplier
+        self.most_recent_col: Optional[int] = None
 
-    def reset(self):
+    def reset(self) -> Tuple:
         """Resets game & takes 1st opponent move if they are chosen to go first."""
         self._board = get_empty_board()
         self._player = random.choice([-1, 1])
@@ -246,7 +235,7 @@ class Connect4Env:
 
         return self._board, reward, self.done, self.info
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self._board_visualizer(self._board)) + "\n"
 
     @property
@@ -265,6 +254,7 @@ class Connect4Env:
         assert not is_column_full(self._board, col), "You can't place a counter in a full column!"
 
         self._board, row = place_piece(self._board, col, self._player)
+        self.most_recent_col = col
 
         # Check for game completion
         won = has_won(self._board, col)
@@ -283,6 +273,9 @@ class Connect4Env:
             print(self)
             if won:
                 print(f"Player {self._player} has won!\n")
+                if self.render:
+                    wait_for_click()
+                    wait_for_click()
             elif board_is_full:
                 print("Board full. It's a tie!")
 
@@ -328,6 +321,12 @@ class Connect4Env:
             self.BLUE_COLOR,
         )
 
+        if self.winner is not None:
+            winning_row = get_top_piece_row_index(self._board, self.most_recent_col)
+            winning_line = get_pieces_four_connected(
+                self._board, (winning_row, self.most_recent_col)
+            )
+
         # Draw the circles - either as spaces if filled or
         for r in range(self.N_ROWS):
             for c in range(self.N_COLS):
@@ -335,9 +334,7 @@ class Connect4Env:
                 colour = (
                     self.RED_COLOR
                     if space == 1
-                    else self.YELLOW_COLOR
-                    if space == -1
-                    else self.BACKGROUND_COLOR
+                    else self.YELLOW_COLOR if space == -1 else self.BACKGROUND_COLOR
                 )
 
                 # Anti-aliased circle drawing
@@ -348,6 +345,15 @@ class Connect4Env:
                     int(self.DISC_SIZE_RATIO * self.SQUARE_SIZE / 2),
                     colour,
                 )
+                if self.winner is not None:
+                    if (r, c) in winning_line:
+                        pygame.gfxdraw.filled_circle(
+                            self._screen,
+                            c * self.SQUARE_SIZE + self.SQUARE_SIZE // 2,
+                            r * self.SQUARE_SIZE + self.SQUARE_SIZE // 2,
+                            int(self.DISC_SIZE_RATIO * self.SQUARE_SIZE / 1.75),
+                            self.WHITE_COLOR,
+                        )
 
                 pygame.gfxdraw.filled_circle(
                     self._screen,
@@ -412,3 +418,76 @@ def load_dictionary(team_name: str, umbrella: Path = HERE) -> Dict:
     dict_path = os.path.join(umbrella, f"dict_{team_name}.pkl")
     with open(dict_path, "rb") as f:
         return pickle.load(f)
+
+
+def wait_for_click() -> None:
+    # If pygame is not initialised, dont wait
+    if not pygame.get_init():
+        return
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                return
+
+
+def get_pieces_four_connected(
+    board: np.ndarray, piece_location: Tuple[int, int]
+) -> List[Tuple[int, int]]:
+    """Adapted from game_mechanics, gets the location of 4 connected pieces. Only call this if you
+    know there is a winner.
+
+    Args:
+        board: The board to check
+        piece_location: The location of the piece to check (row, col)
+
+    Returns: List of (row, col) tuples of the pieces that are four connected
+    """
+    player = board[piece_location]
+    directions = [
+        [0, 1],
+        [1, 1],
+        [1, 0],
+        [1, -1],
+    ]
+
+    # Try all directions
+    for direction in directions:
+        connected_four = [piece_location]
+
+        # We're looking for the longest line through this piece,
+        #  start at the piece with a line of 1
+        num_in_a_row = 1
+
+        # Try spaces in positive direction
+        steps_in_positive_dir = 1
+
+        # Take steps in positive direction until we hit a space not filled by this player's piece
+        row = piece_location[0] + steps_in_positive_dir * direction[0]
+        col = piece_location[1] + steps_in_positive_dir * direction[1]
+        while 0 <= row < board.shape[0] and 0 <= col < board.shape[1] and board[row, col] == player:
+            connected_four.append((row, col))
+            num_in_a_row += 1
+            steps_in_positive_dir += 1
+            row = piece_location[0] + steps_in_positive_dir * direction[0]
+            col = piece_location[1] + steps_in_positive_dir * direction[1]
+
+        # Try spaces in negative direction
+        steps_in_negative_dir = 1
+
+        row = piece_location[0] - steps_in_negative_dir * direction[0]
+        col = piece_location[1] - steps_in_negative_dir * direction[1]
+
+        while (
+            row in range(board.shape[0])
+            and col in range(board.shape[1])
+            and board[row, col] == player
+        ):
+            connected_four.append((row, col))
+            num_in_a_row += 1
+            steps_in_negative_dir += 1
+            row = piece_location[0] - steps_in_negative_dir * direction[0]
+            col = piece_location[1] - steps_in_negative_dir * direction[1]
+        if len(connected_four) >= 4:
+            return connected_four
+
+    raise ValueError("No four connected pieces found")
