@@ -21,9 +21,9 @@ import numpy as np
 import pygame.gfxdraw
 
 
-def choose_move_randomly(state: np.ndarray) -> int:
+def choose_move_randomly(board: np.ndarray) -> int:
     """Chooses a move randomly from available moves given the state."""
-    return random.choice([col for col in range(8) if not is_column_full(state, col)])
+    return random.choice([col for col in range(8) if not is_column_full(board, col)])
 
 
 def play_connect_4_game(
@@ -269,6 +269,7 @@ class Connect4Env:
             time.sleep(1 / self.game_speed_multiplier)
 
         if self.verbose:
+            time.sleep(1 / self.game_speed_multiplier)
             print(f"Player {self._player} places counter at row {row}, column {col}")
             print(self)
             if won:
